@@ -133,10 +133,7 @@ export default function ChatPage() {
               <div className={`flex flex-col gap-2 max-w-[90%] ${message.role === "user" ? "items-end" : "items-start"}`}>
                 {message.role === "user" && (() => {
                   let text = "";
-                  if (typeof message.content === "string") text = message.content;
-                  else if (Array.isArray(message.content))
-                    text = (message.content as Array<{type:string;text?:string}>).filter(p=>p.type==="text").map(p=>p.text??"").join("");
-                  else if (message.parts)
+                  if (message.parts)
                     text = (message.parts as Array<{type:string;text?:string}>).filter(p=>p.type==="text").map(p=>p.text??"").join("");
                   return text ? (
                     <div className="rounded-2xl px-4 py-2.5 text-sm leading-relaxed bg-blue-600 text-white rounded-tr-sm shadow-sm shadow-blue-200">{text}</div>

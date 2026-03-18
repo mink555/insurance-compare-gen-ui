@@ -2,7 +2,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, Legend,
-  AreaChart, Area, defs, linearGradient, stop,
+  AreaChart, Area,
 } from "recharts";
 
 // ── 커스텀 툴팁 ────────────────────────────────────────────────
