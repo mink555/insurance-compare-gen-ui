@@ -10,6 +10,28 @@
 
 ---
 
+## 스크린샷
+
+### 챗봇 모드 — 초기 화면
+![챗봇 초기 화면](docs/screenshot-chat-initial.png)
+
+### 챗봇 모드 — 급부 비교표 렌더링
+> "라이나 vs 한화 전체 급부 비교 보여줘" → LLM이 `show_benefit_table(filter: "전체")` 호출 → `<BenefitTable />` 렌더링
+
+![챗봇 비교표](docs/screenshot-chat-table.png)
+
+### 챗봇 모드 — 레이더 차트 렌더링
+> "카테고리별 점수 차트 보여줘" → LLM이 `show_category_radar()` 호출 → `<CategoryRadar />` 렌더링
+
+![챗봇 레이더 차트](docs/screenshot-chat-radar.png)
+
+### 대시보드 모드 — AI가 설계한 레이아웃
+> "종합 경쟁력 현황 보여줘" → LLM이 KPI 카드 3개 + 레이더 차트 + 히트맵 + 인사이트 카드 레이아웃 설계
+
+![대시보드 결과](docs/screenshot-dashboard-result.png)
+
+---
+
 ## 배경
 
 `insurance-compare`는 라이나생명 vs 한화생명 암보험 특약을 비교하는 프로젝트.  
