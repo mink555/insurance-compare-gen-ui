@@ -5,17 +5,17 @@ import { KPICard } from "@/components/dashboard/KPICard";
 import { CompareBarChart, TrendLineChart } from "@/components/dashboard/Charts";
 import { CoverageHeatmap } from "@/components/dashboard/CoverageHeatmap";
 import { CATEGORY_SCORES } from "@/lib/insurance-data";
-import { Sparkles, Loader2, LayoutDashboard, Cpu, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, LayoutDashboard, Cpu, Plus } from "lucide-react";
 import Link from "next/link";
 
 // ── mock 데이터 ──────────────────────────────────────────────
 const AMOUNT_GAP_DATA = [
   { label: "표적항암약물", value: 3000, compare: 1000 },
-  { label: "암직접통원", value: 30000, compare: 10000 },
-  { label: "암직접입원", value: 50000, compare: 20000 },
-  { label: "방사선치료", value: 3000000, compare: 2000000 },
-  { label: "중환자실", value: 100000, compare: 80000 },
-  { label: "암수술", value: 1000000, compare: 5000000 },
+  { label: "암직접통원",   value: 30000, compare: 10000 },
+  { label: "암직접입원",   value: 50000, compare: 20000 },
+  { label: "방사선치료",   value: 3000000, compare: 2000000 },
+  { label: "중환자실",     value: 100000, compare: 80000 },
+  { label: "암수술",       value: 1000000, compare: 5000000 },
 ];
 
 const MONTHLY_TREND = [
@@ -33,16 +33,16 @@ const HEATMAP_DATA = [
     items: [
       { label: "일반암진단", lina: 85, hanwha: 85 },
       { label: "갑상선진단", lina: 60, hanwha: 85 },
-      { label: "NGS검사", lina: 78, hanwha: 20 },
+      { label: "NGS검사",    lina: 78, hanwha: 20 },
     ],
   },
   {
     category: "치료",
     items: [
       { label: "항암약물", lina: 95, hanwha: 70 },
-      { label: "방사선", lina: 88, hanwha: 72 },
-      { label: "수술", lina: 45, hanwha: 90 },
-      { label: "통원", lina: 92, hanwha: 55 },
+      { label: "방사선",   lina: 88, hanwha: 72 },
+      { label: "수술",     lina: 45, hanwha: 90 },
+      { label: "통원",     lina: 92, hanwha: 55 },
     ],
   },
   {
@@ -75,8 +75,9 @@ function Widget({ widget }: { widget: Record<string, unknown> }) {
     const cards = widget.cards as Array<{
       title: string; value: string; change: number; unit?: string; description?: string;
     }>;
+    const cols = cards?.length === 2 ? "grid-cols-2" : cards?.length === 3 ? "grid-cols-3" : "grid-cols-4";
     return (
-      <div className={`grid gap-3 ${cards?.length === 2 ? "grid-cols-2" : cards?.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}>
+      <div className={`grid gap-4 ${cols}`}>
         {(cards ?? []).map((card, i) => <KPICard key={i} data={card} />)}
       </div>
     );
@@ -84,12 +85,10 @@ function Widget({ widget }: { widget: Record<string, unknown> }) {
 
   if (type === "bar_chart") {
     const dataKey = widget.dataKey as string;
-    const title = widget.title as string;
-    const showCompare = widget.showCompare as boolean;
     const data = dataKey === "category_scores" ? CATEGORY_BAR_DATA
       : dataKey === "amount_gap" ? AMOUNT_GAP_DATA.map(d => ({ label: d.label, value: d.value, compare: d.compare }))
       : MONTHLY_TREND.map(d => ({ label: d.label, value: d.lina, compare: d.hanwha }));
-    return <CompareBarChart title={title} data={data} showCompare={showCompare ?? true} unit="" />;
+    return <CompareBarChart title={widget.title as string} data={data} showCompare={(widget.showCompare as boolean) ?? true} unit="" />;
   }
 
   if (type === "trend_chart") {
@@ -105,26 +104,22 @@ function Widget({ widget }: { widget: Record<string, unknown> }) {
     const isWin = verdict === "당사우위";
     const isLose = verdict === "타사우위";
     return (
-      <div className={`rounded-2xl border p-5 transition-all duration-200 hover:shadow-md
-        ${isWin ? "bg-blue-50 border-blue-100" : isLose ? "bg-amber-50 border-amber-100" : "bg-slate-50 border-slate-100"}`}>
-        <div className="flex items-start justify-between mb-3">
+      <div className={`rounded-2xl border p-6 ${isWin ? "bg-blue-50 border-blue-100" : isLose ? "bg-amber-50 border-amber-100" : "bg-slate-50 border-slate-100"}`}>
+        <div className="flex items-start justify-between mb-4">
           <div>
-            <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1
-              ${isWin ? "text-blue-400" : isLose ? "text-amber-400" : "text-slate-400"}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 ${isWin ? "text-blue-400" : isLose ? "text-amber-400" : "text-slate-400"}`}>
               AI 분석 요약
             </p>
-            <p className="text-sm font-bold text-slate-800">{widget.headline as string}</p>
+            <p className="text-base font-bold text-slate-800">{widget.headline as string}</p>
           </div>
-          <span className={`shrink-0 text-xs font-bold px-3 py-1 rounded-full
-            ${isWin ? "bg-blue-600 text-white" : isLose ? "bg-amber-500 text-white" : "bg-slate-600 text-white"}`}>
+          <span className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full ${isWin ? "bg-blue-600 text-white" : isLose ? "bg-amber-500 text-white" : "bg-slate-600 text-white"}`}>
             {verdict}
           </span>
         </div>
-        <ul className="space-y-2 mt-3">
+        <ul className="space-y-2.5">
           {(widget.bullets as string[])?.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-xs text-slate-600">
-              <span className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[9px] font-bold
-                ${isWin ? "bg-blue-200 text-blue-700" : isLose ? "bg-amber-200 text-amber-700" : "bg-slate-200 text-slate-600"}`}>
+            <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
+              <span className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${isWin ? "bg-blue-200 text-blue-700" : isLose ? "bg-amber-200 text-amber-700" : "bg-slate-200 text-slate-600"}`}>
                 {i + 1}
               </span>
               {b}
@@ -138,19 +133,17 @@ function Widget({ widget }: { widget: Record<string, unknown> }) {
   return null;
 }
 
-// ── 스켈레톤 ────────────────────────────────────────────────
-function Skeleton({ className }: { className: string }) {
-  return <div className={`animate-pulse bg-slate-100 rounded-2xl ${className}`} />;
+function Skeleton() {
+  return <div className="animate-pulse bg-slate-100 rounded-2xl h-52" />;
 }
 
-// ── 타입 ────────────────────────────────────────────────────
 type DashboardObject = {
   title?: string;
   subtitle?: string;
   widgets?: Array<Record<string, unknown>>;
 };
 
-// ── 메인 페이지 ──────────────────────────────────────────────
+// ── 메인 ────────────────────────────────────────────────────
 export default function DashboardPage() {
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState("");
@@ -181,10 +174,7 @@ export default function DashboardPage() {
       buf = lines.pop() ?? "";
       for (const line of lines) {
         if (!line.trim()) continue;
-        try {
-          const parsed = JSON.parse(line);
-          setObject(parsed);
-        } catch { /* 파싱 실패 라인 무시 */ }
+        try { setObject(JSON.parse(line)); } catch { /* 무시 */ }
       }
     }
     if (buf.trim()) {
@@ -206,7 +196,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* 헤더 */}
-      <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-3">
+      <header className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-3 shrink-0">
         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm">
           <LayoutDashboard className="w-4 h-4 text-white" />
         </div>
@@ -226,20 +216,18 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* 쿼리 입력 */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4">
-        <div className="max-w-3xl mx-auto">
+      {/* 입력 영역 */}
+      <div className="bg-white border-b border-slate-100 px-6 py-4 shrink-0">
+        <div className="max-w-4xl mx-auto space-y-3">
           <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-                placeholder="어떤 분석이 필요하세요? (예: 종합 경쟁력 현황, 약점 분석...)"
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 bg-slate-50 placeholder:text-slate-400 text-slate-700 transition-all"
-                disabled={isLoading}
-              />
-            </div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              placeholder="어떤 분석이 필요하세요? (예: 종합 경쟁력 현황, 약점 분석...)"
+              className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 bg-slate-50 placeholder:text-slate-400 text-slate-700 transition-all"
+              disabled={isLoading}
+            />
             <button
               onClick={() => handleSubmit()}
               disabled={isLoading || !query.trim()}
@@ -249,43 +237,41 @@ export default function DashboardPage() {
               {isLoading ? "생성 중..." : "생성"}
             </button>
           </div>
-
-          {/* 제안 쿼리 */}
-          {!submitted && (
-            <div className="flex gap-2 mt-2.5 flex-wrap">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleSubmit(s)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-all font-medium"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-2 flex-wrap">
+            {SUGGESTIONS.map((s) => (
+              <button
+                key={s}
+                onClick={() => handleSubmit(s)}
+                disabled={isLoading}
+                className="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all font-medium disabled:opacity-40"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 대시보드 본문 */}
-      <div className="flex-1 px-6 py-6">
-        <div className="max-w-5xl mx-auto">
+      {/* 본문 */}
+      <div className="flex-1 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
 
           {/* 초기 상태 */}
           {!submitted && !isLoading && (
-            <div className="flex flex-col items-center justify-center py-24 gap-5 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center">
-                <LayoutDashboard className="w-7 h-7 text-blue-400" />
+            <div className="flex flex-col items-center justify-center py-28 gap-5 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
+                <LayoutDashboard className="w-6 h-6 text-slate-300" />
               </div>
               <div>
-                <p className="font-bold text-slate-700 text-base">질문하면 AI가 대시보드를 구성합니다</p>
-                <p className="text-sm text-slate-400 mt-1">어떤 분석이 필요한지 자연어로 입력하세요</p>
+                <p className="font-semibold text-slate-600">질문하면 AI가 대시보드를 구성합니다</p>
+                <p className="text-sm text-slate-400 mt-1">위 버튼을 누르거나 직접 입력하세요</p>
               </div>
-              <div className="bg-white rounded-2xl border border-slate-100 p-5 text-left max-w-md text-xs text-slate-500 space-y-2 shadow-sm">
-                <p className="font-semibold text-slate-600 text-[11px] uppercase tracking-wide">Generative UI Dashboard</p>
-                <p>→ <strong className="text-slate-700">"비교 분석"</strong> → 바 차트 + 히트맵 조합</p>
-                <p>→ <strong className="text-slate-700">"약점 분석"</strong> → 격차 차트 + AI 인사이트</p>
-                <p className="text-slate-400 pt-1 border-t border-slate-100 mt-1">레이아웃 자체를 LLM이 결정합니다</p>
+              <div className="flex gap-6 text-xs text-slate-400 mt-2">
+                <span>"비교 분석" → 바 차트 + 히트맵</span>
+                <span className="text-slate-200">|</span>
+                <span>"약점 분석" → 격차 차트 + AI 인사이트</span>
+                <span className="text-slate-200">|</span>
+                <span>레이아웃 자체를 LLM이 결정</span>
               </div>
             </div>
           )}
@@ -293,7 +279,7 @@ export default function DashboardPage() {
           {/* 로딩 */}
           {isLoading && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-xs text-blue-500 font-medium">
+              <div className="flex items-center gap-2 text-xs text-blue-500 font-medium mb-2">
                 <Cpu className="w-3.5 h-3.5 animate-pulse" />
                 <span>
                   {object?.title
@@ -302,50 +288,47 @@ export default function DashboardPage() {
                 </span>
               </div>
               {(object?.widgets ?? []).map((w, i) =>
-                w?.type ? <Widget key={i} widget={w as Record<string, unknown>} /> : <Skeleton key={i} className="h-48" />
+                w?.type ? <Widget key={i} widget={w as Record<string, unknown>} /> : <Skeleton key={i} />
               )}
               {[...Array(Math.max(0, 3 - (object?.widgets?.length ?? 0)))].map((_, i) => (
-                <Skeleton key={`sk-${i}`} className="h-48" />
+                <Skeleton key={`sk-${i}`} />
               ))}
             </div>
           )}
 
-          {/* 완성된 대시보드 */}
+          {/* 결과 */}
           {hasResult && (
-            <div className="space-y-5">
-              {/* 대시보드 헤더 */}
+            <div className="space-y-6">
+              {/* 결과 헤더 */}
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-slate-800 tracking-tight">{object.title}</h2>
                   <p className="text-sm text-slate-400 mt-0.5">{object.subtitle}</p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 bg-slate-100 rounded-lg px-2.5 py-1.5 font-medium">
+                <div className="flex items-center gap-2 shrink-0 mt-0.5">
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5">
                     <Cpu className="w-3 h-3" />
-                    <span>{object.widgets?.length}개 위젯</span>
+                    <span>LLM → {object.widgets?.length}개 위젯</span>
                   </div>
                   <button
                     onClick={() => { setSubmitted(""); setObject(null); }}
                     className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 bg-white border border-slate-200 rounded-lg px-3 py-1.5 transition-colors font-medium hover:border-blue-200"
                   >
-                    <RefreshCw className="w-3 h-3" />새 질문
+                    <Plus className="w-3 h-3" />새 질문
                   </button>
                 </div>
               </div>
 
-              {/* 위젯들 */}
+              {/* 위젯 */}
               <div className="space-y-4">
                 {(object.widgets ?? []).map((widget, i) => (
                   widget?.type ? <Widget key={i} widget={widget as Record<string, unknown>} /> : null
                 ))}
               </div>
 
-              {/* 하단 */}
-              <div className="text-center pt-1 pb-4">
-                <span className="text-[11px] text-slate-300">
-                  "{submitted}" 분석 결과
-                </span>
-              </div>
+              <p className="text-center text-[11px] text-slate-300 pt-2 pb-6">
+                "{submitted}" 분석 결과
+              </p>
             </div>
           )}
         </div>
